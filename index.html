@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jessie Math | 怎樣解題大冒險</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700;800&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f3f4f6; touch-action: manipulation; }
+        .font-brand { font-family: 'Baloo 2', cursive; }
+        
+        /* Header 樣式優化 */
+        .jessie-header { 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); 
+            background-color: white; 
+            padding: 0.5rem 1rem; 
+            position: sticky; top: 0; z-index: 50; 
+            border-bottom: 1px solid #eee;
+        }
+        .logo-circle { 
+            width: 45px; height: 45px; border-radius: 50%; 
+            border: 2px solid #F59E0B; padding: 2px; 
+        }
+        .brand-text { color: #2c3e50; font-size: 1.4rem; font-weight: 800; margin-left: 8px; }
+
+        /* 按鈕樣式 */
+        .btn-nav { 
+            display: flex; align-items: center; gap: 6px; 
+            padding: 6px 14px; border-radius: 20px; 
+            color: #555; font-weight: 600; font-size: 0.95rem; 
+            transition: all 0.2s; border: 1px solid transparent;
+        }
+        .btn-nav:hover { background-color: #f3f4f6; color: #3B82F6; }
+        
+        /* 特殊按鈕：回到六年級... */
+        .btn-outline-purple {
+            border: 1.5px solid #6366f1; color: #6366f1; background: white;
+        }
+        .btn-outline-purple:hover { background: #eef2ff; }
+
+        .btn-primary { 
+            background-color: #3B82F6; color: white; border-radius: 9999px; 
+            padding: 0.5rem 1.5rem; font-weight: bold; 
+            transition: transform 0.1s; box-shadow: 0 4px 0 #2563EB; 
+        }
+        .btn-primary:active { transform: translateY(4px); box-shadow: none; }
+
+        /* 動畫與特效 */
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .combo-text {
+            font-size: 1.2rem; font-weight: 900; color: #F59E0B;
+            opacity: 0; transform: scale(0.5); transition: all 0.3s;
+        }
+        .combo-text.show { opacity: 1; transform: scale(1.2); }
+
+        .step-card { background: white; border-left: 5px solid #F59E0B; padding: 1rem; margin-bottom: 0.5rem; border-radius: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        
+        /* 情境插圖卡 */
+        .context-card {
+            font-size: 4rem; margin-bottom: 10px; color: #4B5563;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+
+        /* 星星 */
+        .star { color: #D1D5DB; font-size: 2rem; }
+        .star.filled { color: #F59E0B; }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="jessie-header flex justify-between items-center">
+        <div class="flex items-center cursor-pointer" onclick="goHome()">
+            <img src="JESSIEMATH-Q.png" alt="Logo" class="logo-circle">
+            <span class="brand-text font-brand">Jessie Math</span>
+        </div>
+        
+        <div class="flex items-center gap-2 sm:gap-3">
+            <a href="https://jessiemath0703-chu.github.io/website2/" class="btn-nav">
+                <i class="fa-solid fa-house"></i><span class="hidden sm:inline">首頁</span>
+            </a>
+            <a href="https://jessiemath0703-chu.github.io/Game-Lobby/" class="btn-nav">
+                <i class="fa-solid fa-gamepad"></i><span class="hidden sm:inline">遊戲大廳</span>
+            </a>
+            <a href="https://jessiemath0703-chu.github.io/Game-Lobby/" class="btn-nav btn-outline-purple">
+                <i class="fa-solid fa-chevron-left"></i><span class="hidden sm:inline">六年級怎樣解題(一)</span>
+            </a>
+        </div>
+    </header>
+
+    <main id="game-container" class="flex-grow container mx-auto p-4 max-w-4xl flex flex-col justify-center items-center">
+        
+        <div id="screen-login" class="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl text-center fade-in">
+            <div class="text-6xl mb-4">🧩</div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">怎樣解題大冒險</h1>
+            <p class="text-gray-500 mb-6">60秒極限挑戰，準備好你的大腦了嗎？</p>
+            <div class="mb-6">
+                <input type="text" id="player-name" placeholder="輸入你的名字" class="w-full px-4 py-3 rounded-lg border-2 border-gray-300 focus:border-blue-500 focus:outline-none text-lg text-center font-bold">
+            </div>
+            <button onclick="checkNameAndStart()" class="w-full btn-primary text-xl shadow-blue-500/50">進入冒險</button>
+        </div>
+
+        <div id="screen-level-select" class="w-full hidden fade-in flex flex-col gap-8">
+            <h2 class="text-2xl font-bold text-center text-gray-800">選擇挑戰關卡</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <button onclick="selectLevel(1)" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg border-b-4 border-green-500 hover:-translate-y-1 transition text-left group">
+                    <div class="text-4xl mb-2 group-hover:scale-110 transition">⚖️</div>
+                    <div class="text-green-600 text-sm font-bold">第一關｜和不變</div>
+                    <h3 class="text-xl font-bold">不變的祕密</h3>
+                </button>
+                <button onclick="selectLevel(2)" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg border-b-4 border-blue-500 hover:-translate-y-1 transition text-left group">
+                    <div class="text-4xl mb-2 group-hover:scale-110 transition">📏</div>
+                    <div class="text-blue-600 text-sm font-bold">第二關｜差不變</div>
+                    <h3 class="text-xl font-bold">差值守門人</h3>
+                </button>
+                <button onclick="selectLevel(3)" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg border-b-4 border-purple-500 hover:-translate-y-1 transition text-left group">
+                    <div class="text-4xl mb-2 group-hover:scale-110 transition">🔍</div>
+                    <div class="text-purple-600 text-sm font-bold">第三關｜商不變</div>
+                    <h3 class="text-xl font-bold">縮放迷宮</h3>
+                </button>
+                <button onclick="selectLevel(4)" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg border-b-4 border-red-500 hover:-translate-y-1 transition text-left group">
+                    <div class="text-4xl mb-2 group-hover:scale-110 transition">🧱</div>
+                    <div class="text-red-600 text-sm font-bold">第四關｜積不變</div>
+                    <h3 class="text-xl font-bold">交易市場</h3>
+                </button>
+                <button onclick="selectLevel(5)" class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg border-b-4 border-yellow-500 hover:-translate-y-1 transition text-left col-span-1 md:col-span-2 lg:col-span-1 group">
+                    <div class="text-4xl mb-2 group-hover:scale-110 transition">🐇</div>
+                    <div class="text-yellow-600 text-sm font-bold">第五關｜雞兔問題</div>
+                    <h3 class="text-xl font-bold">偵查任務</h3>
+                </button>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-lg p-6 max-w-3xl mx-auto w-full">
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="text-2xl">🏆</span><h3 class="text-xl font-bold text-gray-800">榮譽榜 (本機紀錄)</h3>
+                </div>
+                <div id="select-screen-lb-list" class="min-h-[100px]"></div>
+            </div>
+        </div>
+
+        <div id="screen-game" class="w-full max-w-2xl hidden flex flex-col h-full relative">
+            <div class="flex justify-between items-center bg-white p-3 rounded-xl shadow-sm mb-4">
+                <div class="flex items-center gap-4">
+                    <div class="text-gray-600 font-bold text-xl"><i class="fa-solid fa-stopwatch mr-1 text-red-500"></i> <span id="game-timer">60</span>s</div>
+                    <div class="text-orange-500 font-bold text-xl"><i class="fa-solid fa-star mr-1"></i> <span id="game-score">0</span></div>
+                </div>
+                <div id="combo-display" class="combo-text">Combo x2 🔥</div>
+                <div class="flex gap-2">
+                    <button onclick="pauseGame()" class="w-10 h-10 bg-gray-100 rounded-full hover:bg-gray-200 text-gray-600"><i class="fa-solid fa-pause"></i></button>
+                    <button onclick="restartGame()" class="w-10 h-10 bg-blue-100 rounded-full hover:bg-blue-200 text-blue-600"><i class="fa-solid fa-rotate-right"></i></button>
+                </div>
+            </div>
+
+            <div id="question-area" class="bg-white p-6 rounded-2xl shadow-lg flex-grow flex flex-col justify-center items-center text-center relative overflow-hidden min-h-[300px]">
+                <div id="context-illustration" class="context-card"></div>
+                <div id="question-content" class="w-full z-10"></div>
+            </div>
+
+            <div id="controls-area" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3 pb-8"></div>
+
+            <div id="modal-pause" class="absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col justify-center items-center z-50 hidden rounded-2xl">
+                <div class="text-6xl mb-4 text-blue-500"><i class="fa-solid fa-circle-pause"></i></div>
+                <h2 class="text-3xl font-bold mb-8 text-gray-800">遊戲暫停</h2>
+                <button onclick="resumeGame()" class="btn-primary mb-4 w-48 py-3 text-lg"><i class="fa-solid fa-play mr-2"></i> 繼續挑戰</button>
+                <button onclick="quitGame()" class="bg-gray-200 text-gray-700 px-6 py-3 rounded-full font-bold w-48 hover:bg-gray-300">回到選單</button>
+            </div>
+        </div>
+
+        <div id="screen-result" class="w-full max-w-md hidden text-center fade-in">
+            <div class="bg-white p-8 rounded-2xl shadow-xl border-t-8 border-yellow-400">
+                <h2 class="text-2xl font-bold text-gray-500 mb-2">Time's Up!</h2>
+                <div class="text-5xl font-bold text-gray-800 mb-2"><span id="result-score">0</span> 分</div>
+                
+                <div id="result-stars" class="flex justify-center gap-2 mb-6">
+                    <i class="fa-solid fa-star star"></i>
+                    <i class="fa-solid fa-star star"></i>
+                    <i class="fa-solid fa-star star"></i>
+                </div>
+
+                <div class="flex flex-col gap-3">
+                    <button onclick="restartGame()" class="btn-primary w-full py-3 text-lg">再玩一次</button>
+                    <button onclick="quitGame()" class="bg-gray-100 text-gray-600 py-3 rounded-full font-bold hover:bg-gray-200">返回選單</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // --- 題庫資料 ---
+        const levels = {
+            1: { icon: "⚖️", data: [
+                { q: "小明給小華 50 元，請問兩人的「錢數總和」？", type: "choice", options: ["變多", "變少", "不變"], ans: 2 },
+                { q: "一大瓶果汁倒進三個杯子後，果汁「總量」是？", type: "choice", options: ["變多", "不變", "變少"], ans: 1 },
+                { q: "A 班有 20 人，B 班有 20 人。A 班轉 5 人去 B 班，兩班共有幾人？", type: "input", ans: 40 }, 
+                { q: "一堆糖果原本每包裝 6 顆，改成每包裝 4 顆，糖果「總顆數」？", type: "choice", options: ["變多", "變少", "不變"], ans: 2 },
+                { q: "左手 3 個蘋果，右手 2 個。左手給右手 1 個，雙手共有幾個蘋果？", type: "input", ans: 5 },
+                { q: "樹上有 5 隻鳥，飛來 2 隻又飛走 2 隻，樹上鳥的總數？", type: "choice", options: ["變多", "變少", "不變"], ans: 2 }
+            ]},
+            2: { icon: "📏", data: [
+                { q: "今年爸爸比我大 25 歲，10 年後，爸爸比我大幾歲？", type: "input", ans: 25 },
+                { q: "兩人一起爬樓梯，都往上爬了 5 格，兩人之間的「距離」？", type: "choice", options: ["變遠", "變近", "不變"], ans: 2 },
+                { q: "小明 80 分，小華 70 分。老師各加 5 分。兩人的「分差」是多少？", type: "input", ans: 10 },
+                { q: "天秤左邊 15，右邊 10。左邊加 3，右邊要怎麼做才能維持差不變？", type: "choice", options: ["減 3", "加 3", "不動"], ans: 1 },
+                { q: "兩台電梯原本差 3 個樓層，同時上升 2 層樓，現在差幾樓？", type: "input", ans: 3 }
+            ]},
+            3: { icon: "🔍", data: [
+                { q: "做蛋糕，糖變 2 倍，水也要變幾倍才一樣甜？", type: "choice", options: ["2 倍", "一半", "不變"], ans: 0 },
+                { q: "照片原本寬 10，放大後寬變成 30。這是放大了幾倍？", type: "input", ans: 3 },
+                { q: "影印機放大 200%。原本長度 5 公分的線，會變成幾公分？", type: "input", ans: 10 },
+                { q: "地圖比例尺 1:100。地圖上 2 公分代表實際幾公分？", type: "input", ans: 200 },
+                { q: "煮飯米變少一半，水要怎麼變？", type: "choice", options: ["變一半", "變2倍", "不變"], ans: 0 }
+            ]},
+            4: { icon: "🧱", data: [
+                { q: "長方形面積固定。長變 2 倍，寬要變成？", type: "choice", options: ["2 倍", "一半", "不變"], ans: 1 },
+                { q: "去台北時速 60 開 2 小時。時速變 120 (快2倍)，時間只要幾小時？", type: "input", ans: 1 },
+                { q: "工程人數變 2 倍，工作天數會？", type: "choice", options: ["變少", "變多", "不變"], ans: 0 },
+                { q: "有 100 元，買 10 元的筆可買 10 枝。買 20 元的筆只能買幾枝？", type: "input", ans: 5 },
+                { q: "披薩總量固定。分給 4 人吃飽，改分給 8 人，每人吃到的會？", type: "choice", options: ["變少", "變多", "不變"], ans: 0 }
+            ]},
+            5: { icon: "🐇", type: "investigation", data: [
+                { story: "農場有雞和兔共 10 隻，算一算有 28 隻腳。", totalHead: 10, totalLeg: 28, legA: 2, legB: 4, nameA: "雞", nameB: "兔", unit: "隻腳" },
+                { story: "停車場有汽車和機車共 8 台，算一算有 26 個輪子。", totalHead: 8, totalLeg: 26, legA: 2, legB: 4, nameA: "機車", nameB: "汽車", unit: "個輪子" },
+                { story: "存錢筒有 10 元和 5 元共 10 個，總共有 80 元。", totalHead: 10, totalLeg: 80, legA: 5, legB: 10, nameA: "5元", nameB: "10元", unit: "元" }
+            ]}
+        };
+
+        let state = { 
+            name: "", level: 1, score: 0, timer: 60, 
+            interval: null, isPaused: false, combo: 0, 
+            investigationStep: 0, currentStepData: null 
+        };
+
+        const screens = { 
+            login: document.getElementById('screen-login'), 
+            select: document.getElementById('screen-level-select'), 
+            game: document.getElementById('screen-game'), 
+            result: document.getElementById('screen-result') 
+        };
+
+        // --- 畫面導航 ---
+        function showScreen(id) { 
+            Object.values(screens).forEach(s => s.classList.add('hidden')); 
+            screens[id].classList.remove('hidden'); 
+        }
+
+        function goHome() { window.location.href = "https://jessiemath0703-chu.github.io/website2/"; }
+
+        function checkNameAndStart() {
+            const val = document.getElementById('player-name').value.trim();
+            if(!val) return alert("請輸入名字！");
+            state.name = val;
+            showScreen('select');
+            renderLeaderboard();
+        }
+
+        function selectLevel(lvl) {
+            state.level = lvl;
+            restartGame();
+        }
+
+        // --- 遊戲核心邏輯 ---
+        function restartGame() {
+            // 重置所有狀態
+            state.score = 0;
+            state.timer = 60; // 固定 60 秒
+            state.combo = 0;
+            state.isPaused = false;
+            state.investigationStep = 0;
+            state.currentStepData = null;
+            
+            clearInterval(state.interval);
+            document.getElementById('modal-pause').classList.add('hidden');
+            
+            showScreen('game');
+            updateHUD();
+            nextQuestion(); // 隨機出第一題
+            
+            // 啟動計時器
+            state.interval = setInterval(() => {
+                if(!state.isPaused) {
+                    state.timer--;
+                    updateHUD();
+                    if(state.timer <= 0) endGame();
+                }
+            }, 1000);
+        }
+
+        function pauseGame() { state.isPaused = true; document.getElementById('modal-pause').classList.remove('hidden'); }
+        function resumeGame() { state.isPaused = false; document.getElementById('modal-pause').classList.add('hidden'); }
+        
+        // 回選單 (不存分)
+        function quitGame() { 
+            clearInterval(state.interval); 
+            showScreen('select'); 
+            renderLeaderboard();
+        }
+
+        function updateHUD() {
+            document.getElementById('game-timer').innerText = state.timer;
+            document.getElementById('game-score').innerText = state.score;
+            
+            const comboEl = document.getElementById('combo-display');
+            if(state.combo >= 2) {
+                comboEl.innerText = `Combo x${state.combo} 🔥`;
+                comboEl.classList.add('show');
+            } else {
+                comboEl.classList.remove('show');
+            }
+        }
+
+        // --- 題目生成 ---
+        function nextQuestion() {
+            const config = levels[state.level];
+            const qArea = document.getElementById('question-content');
+            const cArea = document.getElementById('controls-area');
+            const iconArea = document.getElementById('context-illustration');
+
+            // 設定情境插圖
+            iconArea.innerText = config.icon;
+
+            // 隨機選題 (無限題庫模式)
+            const randomIdx = Math.floor(Math.random() * config.data.length);
+            const qData = config.data[randomIdx];
+
+            // 特殊題型：第五關 雞兔問題 (逐步解題)
+            if(config.type === 'investigation') {
+                state.currentStepData = qData;
+                renderInvestigation(qData, qArea, cArea);
+                return;
+            }
+
+            // 一般題型
+            qArea.innerHTML = `<h3 class="text-2xl font-bold mb-4 text-gray-800">${qData.q}</h3>`;
+            cArea.innerHTML = '';
+
+            if(qData.type === 'choice') {
+                qData.options.forEach((opt, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = "bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold py-4 px-6 rounded-xl transition text-lg w-full";
+                    btn.innerText = opt;
+                    btn.onclick = () => checkAnswer(idx, qData.ans);
+                    cArea.appendChild(btn);
+                });
+            } else if(qData.type === 'input') {
+                cArea.innerHTML = `
+                    <input type="number" id="ans-input" class="col-span-1 border-2 border-gray-300 rounded-lg px-4 py-2 text-2xl text-center w-full" placeholder="?">
+                    <button id="submit-btn" class="col-span-1 btn-primary w-full h-full text-xl">送出</button>
+                `;
+                document.getElementById('submit-btn').onclick = () => {
+                    const val = parseInt(document.getElementById('ans-input').value);
+                    checkAnswer(val, qData.ans);
+                };
+            }
+        }
+
+        // --- 雞兔問題 逐步渲染 ---
+        function renderInvestigation(data, qArea, cArea) {
+            const unit = data.unit;
+            // 定義步驟
+            const steps = [
+                {
+                    text: `案件：${data.story}<br>👉 第一步：先假設全部都是「${data.nameA}」！`,
+                    q: `若是 ${data.totalHead} 個${data.nameA}，共有多少${unit}？`,
+                    ans: data.totalHead * data.legA
+                },
+                {
+                    text: `假設全是${data.nameA}，會有 ${data.totalHead * data.legA} ${unit}。<br>但現場實際有 ${data.totalLeg} ${unit}。<br>👉 第二步：差距是多少？`,
+                    q: `差距是： ${data.totalLeg} 與 ${data.totalHead * data.legA} 相減 = ?`,
+                    ans: Math.abs(data.totalLeg - (data.totalHead * data.legA))
+                },
+                {
+                    text: `總差距是 ${Math.abs(data.totalLeg - (data.totalHead * data.legA))}。<br>👉 第三步：如果把一個${data.nameA}換成${data.nameB}，${unit}會差多少？`,
+                    q: `${data.nameB}(${data.legB}) 與 ${data.nameA}(${data.legA}) 差多少？`,
+                    ans: Math.abs(data.legB - data.legA)
+                },
+                {
+                    text: `總差距 ÷ 單個差距 = 數量。<br>👉 第四步：所以有幾個${data.nameB}？`,
+                    q: `答案是？`,
+                    ans: Math.abs(data.totalLeg - (data.totalHead * data.legA)) / Math.abs(data.legB - data.legA)
+                }
+            ];
+
+            const current = steps[state.investigationStep];
+            
+            qArea.innerHTML = `
+                <div class="text-left w-full">
+                    <div class="bg-yellow-50 p-2 rounded text-sm text-gray-500 mb-2">🕵️ ${data.story}</div>
+                    <div class="step-card"><p class="font-bold text-lg">${current.text}</p></div>
+                    <div class="text-center text-xl font-bold text-blue-600 mt-4">${current.q}</div>
+                </div>
+            `;
+            
+            cArea.innerHTML = `
+                <input type="number" id="inv-input" class="border-2 border-blue-300 rounded-lg px-4 py-2 text-xl text-center w-full">
+                <button id="inv-btn" class="btn-primary w-full text-xl">送出</button>
+            `;
+
+            document.getElementById('inv-btn').onclick = () => {
+                const val = parseInt(document.getElementById('inv-input').value);
+                if(val === current.ans) {
+                    state.investigationStep++;
+                    state.score += 20; // 步驟分
+                    state.combo++;
+                    updateHUD();
+                    
+                    if(state.investigationStep >= steps.length) {
+                        // 完成一題雞兔問題
+                        alert(`恭喜！答案就是 ${val} 個${data.nameB}！`);
+                        state.investigationStep = 0;
+                        nextQuestion(); // 換下一題
+                    } else {
+                        renderInvestigation(data, qArea, cArea); // 下一步
+                    }
+                } else {
+                    state.combo = 0;
+                    updateHUD();
+                    alert(`算錯囉！答案是 ${current.ans}`);
+                }
+            };
+        }
+
+        // --- 答案檢查 ---
+        function checkAnswer(userAns, correctAns) {
+            if(userAns == correctAns) {
+                // 答對
+                state.combo++;
+                const bonus = state.combo * 10;
+                state.score += (100 + bonus);
+                updateHUD();
+                nextQuestion();
+            } else {
+                // 答錯
+                state.combo = 0;
+                updateHUD();
+                // 顯示正確答案
+                alert(`答錯囉！正確答案是：${correctAns}`);
+                nextQuestion();
+            }
+        }
+
+        // --- 遊戲結束 ---
+        function endGame() {
+            clearInterval(state.interval);
+            showScreen('result');
+            document.getElementById('result-score').innerText = state.score;
+
+            // 星級計算
+            let stars = 1;
+            if(state.score >= 500) stars = 2;
+            if(state.score >= 1000) stars = 3;
+
+            const starContainer = document.getElementById('result-stars');
+            starContainer.innerHTML = '';
+            for(let i=0; i<3; i++) {
+                const s = document.createElement('i');
+                s.className = `fa-solid fa-star star ${i < stars ? 'filled' : ''}`;
+                starContainer.appendChild(s);
+            }
+
+            // 儲存紀錄
+            saveScore();
+        }
+
+        function saveScore() {
+            const key = "jessie_math_lb";
+            let lb = JSON.parse(localStorage.getItem(key) || "[]");
+            lb.push({ name: state.name, score: state.score, level: state.level });
+            lb.sort((a,b) => b.score - a.score);
+            localStorage.setItem(key, JSON.stringify(lb.slice(0, 5))); // 只留前5
+        }
+
+        function renderLeaderboard() {
+            const key = "jessie_math_lb";
+            let lb = JSON.parse(localStorage.getItem(key) || "[]");
+            // 過濾當前關卡的紀錄
+            lb = lb.filter(x => x.level == state.level).slice(0,5); // 若沒選關卡預設1
+
+            const list = document.getElementById('select-screen-lb-list');
+            if(lb.length === 0) {
+                list.innerHTML = `<div class="text-gray-400 text-center py-4">尚無紀錄</div>`;
+                return;
+            }
+            list.innerHTML = lb.map((p, i) => `
+                <div class="flex justify-between items-center p-2 border-b">
+                    <div><span class="font-bold text-orange-500 mr-2">#${i+1}</span> ${p.name}</div>
+                    <div class="font-bold text-gray-600">${p.score}分</div>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
